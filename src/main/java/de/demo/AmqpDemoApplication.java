@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import de.demo.amqp.producer.SimpleProducer;
+import de.demo.amqp.rpc.RpcRequestClient;
 
 
 @SpringBootApplication
@@ -17,14 +18,17 @@ public class AmqpDemoApplication {
 	}
 	
 	@Bean
-	CommandLineRunner simple(@Value("${rabbitmq.exchange}")String exchange, @Value("${rabbitmq.routingkey}")String routingKey, SimpleProducer producer){
-		return args -> {
-			producer.sendMessage(exchange, routingKey, "HELLO, AMQP!");
-			producer.sendMessage(exchange, routingKey, "HELLO, AMQP!");
-			producer.sendMessage(exchange, routingKey, "HELLO, AMQP!");
-			producer.sendMessage(exchange, routingKey, "HELLO, AMQP!");
-			
-		};
-	}
+    CommandLineRunner
+    simple(@Value("${rabbitqm.exchange:}")String exchange,
+           @Value("${rabbitmq.queue}")String routingKey,
+           RpcRequestClient client){
+                return args -> {
+                    Object result = client
+                             .sendMessage(exchange,
+                                        routingKey,
+                                     "HELLO AMQP/RPC!");
+                        assert result!=null;
+           };
+    }
 
 }

@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class SimpleConsumer {
 	
 	private static final Logger log = LoggerFactory.getLogger("Consumer");
