@@ -1,7 +1,5 @@
 package de.demo.config;
 
-import java.io.IOException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.core.AmqpAdmin;
@@ -10,27 +8,26 @@ import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
+import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.ChannelCallback;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.ConditionalRejectingErrorHandler;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
+import org.springframework.amqp.rabbit.retry.RepublishMessageRecoverer;
 import org.springframework.amqp.rabbit.support.ListenerExecutionFailedException;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.interceptor.RetryOperationsInterceptor;
+import org.springframework.retry.interceptor.StatefulRetryOperationsInterceptor;
 import org.springframework.util.ErrorHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rabbitmq.client.AMQP.Channel;
-import com.rabbitmq.client.BlockedListener;
-import com.rabbitmq.client.ShutdownListener;
-import com.rabbitmq.client.ShutdownSignalException;
 
 import de.demo.aop.AMQPAudit;
 
@@ -108,51 +105,21 @@ public class AMQPConfig {
 		return connectionFactory;
 	}
 
+
+	
+	// Retry for the consumer, normally this needs to be set in the container:  
+	// container.setAdviceChain(new Advice[] { interceptor() });
+	// 
+	// After the 3 attempts, the next will be the RepublishMessageRecoverer
 	@Bean
-	public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-		RabbitTemplate template = new RabbitTemplate(connectionFactory);
-		template.execute(new ChannelCallback<Object>() {
-
-			@Override
-			public Object doInRabbit(com.rabbitmq.client.Channel channel) throws Exception {
-
-				((com.rabbitmq.client.Channel) channel).getConnection().addBlockedListener(new BlockedListener() {
-
-					public void handleUnblocked() throws IOException {
-						// Resume business logic
-					}
-
-					public void handleBlocked(String reason) throws IOException {
-						// FlowControl -> Logic to handle block
-					}
-				});
-
-				((com.rabbitmq.client.Channel) channel).getConnection().addShutdownListener(new ShutdownListener() {
-
-					@Override
-					public void shutdownCompleted(ShutdownSignalException cause) {
-						// TODO Auto-generated method stub
-
-					};
-
-				});
-
-				return null;
-			}
-
-		});
-		return template;
+	RetryOperationsInterceptor interceptor(RabbitTemplate template,@Value("${rabbitmq.error-exchange:}")String errorExchange, @Value("${rabbitmq.error-routing-key}")String errorExchangeRountingKey) {
+		return RetryInterceptorBuilder.stateless()
+				.maxAttempts(3)
+				.backOffOptions(1000, 2.0, 10000) 
+				.recoverer(new RepublishMessageRecoverer(template, errorExchange, errorExchangeRountingKey))
+				.build();
 	}
 
-//	@Bean
-//	public SimpleMessageListenerContainer replyListenerContainer() {
-//
-//		SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-//		container.setConnectionFactory(connectionFactory());
-//		container.setQueues(replyQueue());
-//		container.setMessageListener(fixedReplyQueueRabbitTemplate());
-//		return container;
-//	}
 
 	@Bean
 	public AmqpAdmin amqpAdmin() {
