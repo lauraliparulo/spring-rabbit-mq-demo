@@ -3,3 +3,7 @@ Examples inspired by the book "Spring Boot Messaging: Messaging APIs for Enterpr
 
 
 To start rabbitMQ on your machine, go to the root folder and run "docker-compose up" (assuming you have installed Docker!).
+
+
+
+This was originally designed for AMQP 0.9.X...

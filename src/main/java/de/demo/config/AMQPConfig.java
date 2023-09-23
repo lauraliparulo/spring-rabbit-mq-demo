@@ -6,6 +6,7 @@ import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
@@ -13,6 +14,7 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.listener.ConditionalRejectingErrorHandler;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.rabbit.support.ListenerExecutionFailedException;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -28,7 +30,6 @@ import de.demo.aop.AMQPAudit;
 
 @Configuration
 @EnableConfigurationProperties(AMQPProperties.class)
-//@EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableRabbit
 public class AMQPConfig {
 
@@ -97,6 +98,20 @@ public class AMQPConfig {
 //	        rabbitTemplate.setReplyTimeout(replyTimeout);
 //	        rabbitTemplate.setUseDirectReplyToContainer(false);
 //	        return rabbitTemplate;
+//	    }
+
+//	    @Bean
+//	    public SimpleMessageListenerContainer              
+//	                 container(ConnectionFactory connectionFactory,
+//	                        MessageListener consumer,
+//	              @Value("${rabbitmq.queue}")String queueName) {
+//
+//	        SimpleMessageListenerContainer container = new
+//	                             SimpleMessageListenerContainer();
+//	                container.setConnectionFactory(connectionFactory);
+//	                container.setQueueNames(queueName);
+//	                container.setMessageListener(consumer);
+//	                return container;
 //	    }
 	    
 	    @Bean
