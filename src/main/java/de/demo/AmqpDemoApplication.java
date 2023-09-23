@@ -6,7 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import de.demo.amqp.producer.Producer;
+import de.demo.amqp.producer.SimpleProducer;
 
 
 @SpringBootApplication
@@ -17,7 +17,7 @@ public class AmqpDemoApplication {
 	}
 	
 	@Bean
-	CommandLineRunner simple(@Value("${rabbitmq.exchange}")String exchange, @Value("${rabbitmq.routingkey}")String routingKey, Producer producer){
+	CommandLineRunner simple(@Value("${rabbitmq.exchange}")String exchange, @Value("${rabbitmq.routingkey}")String routingKey, SimpleProducer producer){
 		return args -> {
 			producer.sendMessage(exchange, routingKey, "HELLO, AMQP!");
 			producer.sendMessage(exchange, routingKey, "HELLO, AMQP!");

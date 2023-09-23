@@ -21,7 +21,7 @@ public class AMQPAudit {
 	private static final String NEXT_LINE = "\n";
 	private static final Logger log = LoggerFactory.getLogger("AMQPAudit");
 
-	@Pointcut("execution(* de.demo.amqp.*.*(..))")
+	@Pointcut("execution(* de.demo.amqp.*.*.*(..))")
 	public void logAMQP() {
 	};
 
@@ -39,7 +39,7 @@ public class AMQPAudit {
 		return object;
 	}
 
-	@Before("execution(* de.demo.listener.*.*(..))")
+	@Before("execution(* de.demo.amqp.listener.*.*(..))")
 	public void auditListeners(JoinPoint joinPoint) {
 		StringBuilder builder = new StringBuilder(NEXT_LINE);
 		printBefore(builder, joinPoint);

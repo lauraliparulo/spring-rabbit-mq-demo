@@ -2,7 +2,7 @@ package de.demo.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix="spring.rabbitmq")
+@ConfigurationProperties(prefix="rabbitmq")
 public class AMQPProperties {
 
 	private String queue;

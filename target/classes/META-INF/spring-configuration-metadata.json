@@ -1,52 +1,56 @@
 {
   "groups": [{
-    "name": "spring.rabbitmq",
+    "name": "rabbitmq",
     "type": "de.demo.config.AMQPProperties",
     "sourceType": "de.demo.config.AMQPProperties"
   }],
   "properties": [
     {
-      "name": "spring.rabbitmq.error-exchange",
+      "name": "rabbitmq.error-exchange",
+      "type": "java.lang.String",
+      "sourceType": "de.demo.config.AMQPProperties",
+      "defaultValue": ""
+    },
+    {
+      "name": "rabbitmq.error-queue",
       "type": "java.lang.String",
       "sourceType": "de.demo.config.AMQPProperties"
     },
     {
-      "name": "spring.rabbitmq.error-queue",
+      "name": "rabbitmq.error-routing-key",
+      "type": "java.lang.String",
+      "sourceType": "de.demo.config.AMQPProperties",
+      "defaultValue": "error"
+    },
+    {
+      "name": "rabbitmq.exchange",
+      "type": "java.lang.String",
+      "sourceType": "de.demo.config.AMQPProperties",
+      "defaultValue": ""
+    },
+    {
+      "name": "rabbitmq.queue",
       "type": "java.lang.String",
       "sourceType": "de.demo.config.AMQPProperties"
     },
     {
-      "name": "spring.rabbitmq.error-routing-key",
+      "name": "rabbitmq.rate-exchange",
+      "type": "java.lang.String",
+      "sourceType": "de.demo.config.AMQPProperties",
+      "defaultValue": ""
+    },
+    {
+      "name": "rabbitmq.rate-queue",
       "type": "java.lang.String",
       "sourceType": "de.demo.config.AMQPProperties"
     },
     {
-      "name": "spring.rabbitmq.exchange",
+      "name": "rabbitmq.reply-exchange-queue",
       "type": "java.lang.String",
       "sourceType": "de.demo.config.AMQPProperties"
     },
     {
-      "name": "spring.rabbitmq.queue",
-      "type": "java.lang.String",
-      "sourceType": "de.demo.config.AMQPProperties"
-    },
-    {
-      "name": "spring.rabbitmq.rate-exchange",
-      "type": "java.lang.String",
-      "sourceType": "de.demo.config.AMQPProperties"
-    },
-    {
-      "name": "spring.rabbitmq.rate-queue",
-      "type": "java.lang.String",
-      "sourceType": "de.demo.config.AMQPProperties"
-    },
-    {
-      "name": "spring.rabbitmq.reply-exchange-queue",
-      "type": "java.lang.String",
-      "sourceType": "de.demo.config.AMQPProperties"
-    },
-    {
-      "name": "spring.rabbitmq.reply-queue",
+      "name": "rabbitmq.reply-queue",
       "type": "java.lang.String",
       "sourceType": "de.demo.config.AMQPProperties"
     }

@@ -1,4 +1,4 @@
-package de.demo.amqp;
+package de.demo.amqp.reply;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

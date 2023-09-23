@@ -5,12 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Producer {
+public class SimpleProducer {
 
 	private RabbitTemplate template;
 	
 	@Autowired
-	public Producer(RabbitTemplate template){
+	public SimpleProducer(RabbitTemplate template){
 		this.template = template;
 	}
 	
