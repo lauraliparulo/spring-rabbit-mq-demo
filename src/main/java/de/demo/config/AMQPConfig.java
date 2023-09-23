@@ -1,5 +1,7 @@
 package de.demo.config;
 
+import java.io.IOException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.core.AmqpAdmin;
@@ -11,10 +13,10 @@ import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.ChannelCallback;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.ConditionalRejectingErrorHandler;
-import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.rabbit.support.ListenerExecutionFailedException;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -25,6 +27,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ErrorHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rabbitmq.client.AMQP.Channel;
+import com.rabbitmq.client.BlockedListener;
+import com.rabbitmq.client.ShutdownListener;
+import com.rabbitmq.client.ShutdownSignalException;
 
 import de.demo.aop.AMQPAudit;
 
@@ -103,22 +109,50 @@ public class AMQPConfig {
 	}
 
 	@Bean
-	public RabbitTemplate fixedReplyQueueRabbitTemplate() {
-		RabbitTemplate template = new RabbitTemplate(connectionFactory());
-		template.setReplyAddress(replyQueueName);
-		template.setReplyTimeout(60000L);
+	public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+		RabbitTemplate template = new RabbitTemplate(connectionFactory);
+		template.execute(new ChannelCallback<Object>() {
+
+			@Override
+			public Object doInRabbit(com.rabbitmq.client.Channel channel) throws Exception {
+
+				((com.rabbitmq.client.Channel) channel).getConnection().addBlockedListener(new BlockedListener() {
+
+					public void handleUnblocked() throws IOException {
+						// Resume business logic
+					}
+
+					public void handleBlocked(String reason) throws IOException {
+						// FlowControl -> Logic to handle block
+					}
+				});
+
+				((com.rabbitmq.client.Channel) channel).getConnection().addShutdownListener(new ShutdownListener() {
+
+					@Override
+					public void shutdownCompleted(ShutdownSignalException cause) {
+						// TODO Auto-generated method stub
+
+					};
+
+				});
+
+				return null;
+			}
+
+		});
 		return template;
 	}
 
-	@Bean
-	public SimpleMessageListenerContainer replyListenerContainer() {
-
-		SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-		container.setConnectionFactory(connectionFactory());
-		container.setQueues(replyQueue());
-		container.setMessageListener(fixedReplyQueueRabbitTemplate());
-		return container;
-	}
+//	@Bean
+//	public SimpleMessageListenerContainer replyListenerContainer() {
+//
+//		SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+//		container.setConnectionFactory(connectionFactory());
+//		container.setQueues(replyQueue());
+//		container.setMessageListener(fixedReplyQueueRabbitTemplate());
+//		return container;
+//	}
 
 	@Bean
 	public AmqpAdmin amqpAdmin() {
