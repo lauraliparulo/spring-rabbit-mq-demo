@@ -24,7 +24,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
-import org.springframework.retry.interceptor.StatefulRetryOperationsInterceptor;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.util.ErrorHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +33,7 @@ import de.demo.aop.AMQPAudit;
 
 @Configuration
 @EnableConfigurationProperties(AMQPProperties.class)
-@EnableRabbit
+@EnableTransactionManagement
 public class AMQPConfig {
 
 	@Value("${rabbitmq.queue}")
